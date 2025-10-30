@@ -1,7 +1,7 @@
 <template>
   <div id="app" class="app-container">
     <header class="app-header">
-      <h1>HTTP 请求超时-重试-熔断器示例</h1>
+      <h1>Web 开发工具集</h1>
       <div class="fuse-status">
         <span class="status-label">熔断器状态:</span>
         <span class="status-value" :class="`status-${fuseStatus.state}`">
@@ -13,8 +13,25 @@
       </div>
     </header>
 
+    <div class="app-tabs">
+      <button 
+        class="tab-button" 
+        :class="{ 'active': activeTab === 'http' }"
+        @click="activeTab = 'http'"
+      >
+        HTTP 测试工具
+      </button>
+      <button 
+        class="tab-button" 
+        :class="{ 'active': activeTab === 'file' }"
+        @click="activeTab = 'file'"
+      >
+        大文件分片上传
+      </button>
+    </div>
+
     <main class="app-main">
-      <div class="test-section">
+      <div v-if="activeTab === 'http'" class="test-section">
         <div class="test-controls">
           <div class="url-input-group">
             <label for="url">测试URL:</label>
@@ -95,6 +112,10 @@
       </div>
     </main>
 
+    <main v-if="activeTab === 'file'" class="app-main">
+      <FilePipeline />
+    </main>
+
     <!-- Toast 组件 -->
     <Toast
       v-for="(toast, index) in toasts"
@@ -113,6 +134,10 @@
 import { ref, onMounted, computed } from 'vue';
 import { request, getFuseStatus, resetFuse, ErrorType } from './services/http';
 import Toast from './components/Toast.vue';
+import FilePipeline from './views/FilePipeline.vue';
+
+// 标签页状态
+const activeTab = ref('http');
 
 // 测试URL预设选项
 const presetUrls = [
@@ -259,6 +284,42 @@ onMounted(() => {
   margin: 0 0 16px 0;
   font-size: 24px;
   font-weight: 600;
+}
+
+.app-tabs {
+  display: flex;
+  gap: 8px;
+  padding: 0 40px;
+  background-color: #001529;
+  border-bottom: 1px solid #1d2129;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  background-color: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab-button:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.tab-button.active {
+  color: white;
+  border-bottom-color: #1890ff;
+  background-color: rgba(24, 144, 255, 0.1);
+}
+
+.tab-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .fuse-status {
