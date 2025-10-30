@@ -1,0 +1,138 @@
+:root {
+  /* 命令面板主题变量 */
+  --cp-bg: #ffffff;
+  --cp-border: #e5e7eb;
+  --cp-text: #111827;
+  --cp-text-secondary: #6b7280;
+  --cp-accent: #eff6ff;
+  --cp-hover: #f3f4f6;
+  --cp-highlight: #fef3c7;
+  --cp-key-bg: #f3f4f6;
+  --cp-error: #fee2e2;
+  --cp-error-text: #dc2626;
+}
+
+/* 深色模式支持 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cp-bg: #1f2937;
+    --cp-border: #374151;
+    --cp-text: #f9fafb;
+    --cp-text-secondary: #9ca3af;
+    --cp-accent: #1e40af;
+    --cp-hover: #374151;
+    --cp-highlight: #f59e0b;
+    --cp-key-bg: #374151;
+    --cp-error: #7c2d12;
+    --cp-error-text: #f87171;
+  }
+}
+
+/* 应用深色模式类 */
+.dark {
+  --cp-bg: #1f2937;
+  --cp-border: #374151;
+  --cp-text: #f9fafb;
+  --cp-text-secondary: #9ca3af;
+  --cp-accent: #1e40af;
+  --cp-hover: #374151;
+  --cp-highlight: #f59e0b;
+  --cp-key-bg: #374151;
+  --cp-error: #7c2d12;
+  --cp-error-text: #f87171;
+}
+
+/* 基础样式重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f9fafb;
+  color: #111827;
+}
+
+/* 深色模式下的body样式 */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+}
+
+body.dark {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+/* 滚动条全局样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* 深色模式滚动条 */
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6b7280;
+  }
+}
+
+body.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+body.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* 淡入淡出过渡效果 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 120ms ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 页面加载动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.app-container {
+  animation: fadeIn 200ms ease-out;
+}
