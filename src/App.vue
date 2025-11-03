@@ -2,9 +2,68 @@
 import HelloWorld from './components/HelloWorld.vue'
 import TheWelcome from './components/TheWelcome.vue'
 import CommandPalette from './components/CommandPalette.vue'
-import { ref } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 
 const showCommandPalette = ref(false)
+
+// 主题状态管理
+const theme = ref<'light' | 'dark' | 'system'>('system')
+
+// 监听系统主题变化
+const systemTheme = ref('light')
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+const updateSystemTheme = () => {
+  systemTheme.value = mediaQuery.matches ? 'dark' : 'light'
+}
+
+// 计算当前应用的实际主题
+const currentTheme = computed(() => {
+  if (theme.value === 'system') {
+    return systemTheme.value
+  }
+  return theme.value
+})
+
+// 切换主题的方法
+const toggleTheme = (newTheme: 'light' | 'dark' | 'system') => {
+  console.log('toggleTheme called with:', newTheme)
+  theme.value = newTheme
+}
+
+// 应用主题到DOM
+const applyTheme = () => {
+  console.log('applyTheme called, currentTheme:', currentTheme.value)
+  const htmlElement = document.documentElement
+  
+  // 移除所有主题类
+  htmlElement.classList.remove('light', 'dark')
+  
+  // 应用当前主题
+  if (currentTheme.value === 'dark') {
+    htmlElement.classList.add('dark')
+  } else {
+    htmlElement.classList.add('light')
+  }
+  console.log('Theme classes applied:', htmlElement.classList)
+}
+
+// 初始化和监听主题变化
+onMounted(() => {
+  updateSystemTheme()
+  mediaQuery.addEventListener('change', updateSystemTheme)
+  applyTheme()
+})
+
+// 监听当前主题变化并应用
+watch(currentTheme, () => {
+  applyTheme()
+})
+
+// 导出方法供CommandPalette使用
+defineExpose({
+  toggleTheme
+})
 </script>
 
 <template>
@@ -22,7 +81,7 @@ const showCommandPalette = ref(false)
       <TheWelcome />
     </main>
 
-    <CommandPalette v-model="showCommandPalette" />
+    <CommandPalette v-model="showCommandPalette" :toggle-theme="toggleTheme" />
   </div>
 </template>
 

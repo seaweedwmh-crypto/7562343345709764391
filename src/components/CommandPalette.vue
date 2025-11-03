@@ -12,13 +12,19 @@ interface Command {
   disabled?: boolean
 }
 
-const props = defineProps<{
+interface Props {
   modelValue: boolean
-}>()
+  toggleTheme?: (theme: 'light' | 'dark' | 'system') => void
+}
+
+const props = defineProps<Props>()
 
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
+
+// 从props接收toggleTheme方法
+console.log('CommandPalette props:', props)
 
 const searchQuery = ref('')
 const selectedIndex = ref(-1)
@@ -29,49 +35,74 @@ onMounted(() => {
   isMac.value = navigator.platform.includes('Mac')
 })
 
-const commands: Command[] = [
+const commands = computed(() => [
   // 导航命令
-  { id: 'nav-home', label: '返回首页', shortcut: ['CmdOrCtrl', 'H'], action: () => console.log('跳转首页') },
-  { id: 'nav-dashboard', label: '仪表盘', shortcut: ['CmdOrCtrl', 'D'], action: () => console.log('打开仪表盘') },
-  { id: 'nav-settings', label: '设置', shortcut: ['CmdOrCtrl', ','], action: () => console.log('打开设置') },
-  { id: 'nav-help', label: '帮助中心', shortcut: ['F1'], action: () => console.log('打开帮助') },
+  { id: 'nav-home', label: '返回首页', shortcut: ['CmdOrCtrl', 'H'], action: () => console.log('跳转首页'), category: '导航' },
+  { id: 'nav-dashboard', label: '仪表盘', shortcut: ['CmdOrCtrl', 'D'], action: () => console.log('打开仪表盘'), category: '导航' },
+  { id: 'nav-settings', label: '设置', shortcut: ['CmdOrCtrl', ','], action: () => console.log('打开设置'), category: '导航' },
+  { id: 'nav-help', label: '帮助中心', shortcut: ['F1'], action: () => console.log('打开帮助'), category: '导航' },
   
   // 主题命令
-  { id: 'theme-light', label: '浅色主题', description: '切换到浅色模式', action: () => console.log('切换浅色主题') },
-  { id: 'theme-dark', label: '深色主题', description: '切换到深色模式', action: () => console.log('切换深色主题') },
-  { id: 'theme-system', label: '系统主题', description: '跟随系统主题', action: () => console.log('切换系统主题') },
+  { id: 'theme-light', label: '浅色主题', description: '切换到浅色模式', action: () => { console.log('theme-light clicked'); props.toggleTheme?.('light') }, category: '主题' },
+  { id: 'theme-dark', label: '深色主题', description: '切换到深色模式', action: () => { console.log('theme-dark clicked'); props.toggleTheme?.('dark') }, category: '主题' },
+  { id: 'theme-system', label: '系统主题', description: '跟随系统主题', action: () => { console.log('theme-system clicked'); props.toggleTheme?.('system') }, category: '主题' },
   
   // 工具命令
-  { id: 'clear-cache', label: '清理缓存', description: '清除应用缓存数据', action: () => console.log('清理缓存') },
-  { id: 'refresh-page', label: '刷新页面', shortcut: ['CmdOrCtrl', 'R'], action: () => window.location.reload() },
-  { id: 'fullscreen', label: '全屏模式', shortcut: ['F11'], action: () => document.documentElement.requestFullscreen() },
-  { id: 'toggle-devtools', label: '开发者工具', shortcut: ['CmdOrCtrl', 'Shift', 'I'], action: () => console.log('打开开发者工具') },
+  { id: 'clear-cache', label: '清理缓存', description: '清除应用缓存数据', action: () => console.log('清理缓存'), category: '工具' },
+  { id: 'refresh-page', label: '刷新页面', shortcut: ['CmdOrCtrl', 'R'], action: () => window.location.reload(), category: '工具' },
+  { id: 'fullscreen', label: '全屏模式', shortcut: ['F11'], action: () => document.documentElement.requestFullscreen(), category: '工具' },
+  { id: 'toggle-devtools', label: '开发者工具', shortcut: ['CmdOrCtrl', 'Shift', 'I'], action: () => console.log('打开开发者工具'), category: '工具' },
   
   // 编辑命令
-  { id: 'select-all', label: '全选', shortcut: ['CmdOrCtrl', 'A'], action: () => document.execCommand('selectAll') },
-  { id: 'copy', label: '复制', shortcut: ['CmdOrCtrl', 'C'], action: () => document.execCommand('copy') },
-  { id: 'paste', label: '粘贴', shortcut: ['CmdOrCtrl', 'V'], action: () => document.execCommand('paste') },
-  { id: 'cut', label: '剪切', shortcut: ['CmdOrCtrl', 'X'], action: () => document.execCommand('cut') },
+  { id: 'select-all', label: '全选', shortcut: ['CmdOrCtrl', 'A'], action: () => document.execCommand('selectAll'), category: '编辑' },
+  { id: 'copy', label: '复制', shortcut: ['CmdOrCtrl', 'C'], action: () => document.execCommand('copy'), category: '编辑' },
+  { id: 'paste', label: '粘贴', shortcut: ['CmdOrCtrl', 'V'], action: () => document.execCommand('paste'), category: '编辑' },
+  { id: 'cut', label: '剪切', shortcut: ['CmdOrCtrl', 'X'], action: () => document.execCommand('cut'), category: '编辑' },
   
   // 应用命令
-  { id: 'about', label: '关于应用', action: () => console.log('打开关于页面') },
-  { id: 'feedback', label: '反馈意见', action: () => console.log('打开反馈表单') },
-  { id: 'changelog', label: '更新日志', action: () => console.log('查看更新日志') },
-  { id: 'logout', label: '退出登录', action: () => console.log('执行退出登录') },
-]
+  { id: 'about', label: '关于应用', action: () => console.log('打开关于页面'), category: '应用' },
+  { id: 'feedback', label: '反馈意见', action: () => console.log('打开反馈表单'), category: '应用' },
+  { id: 'changelog', label: '更新日志', action: () => console.log('查看更新日志'), category: '应用' },
+  { id: 'logout', label: '退出登录', action: () => console.log('执行退出登录'), category: '应用' },
+])
 
-const filteredCommands = computed(() => {
-  if (!searchQuery.value) return commands
+// 按分类分组命令
+const groupedCommands = computed(() => {
+  if (!searchQuery.value) {
+    return commands.value.reduce((groups, command) => {
+      const category = command.category || '未分类'
+      if (!groups[category]) {
+        groups[category] = []
+      }
+      groups[category].push(command)
+      return groups
+    }, {} as Record<string, Command[]>)
+  }
   
   const query = searchQuery.value.toLowerCase()
-  return commands.filter(cmd => 
+  const filtered = commands.value.filter(cmd => 
     cmd.label.toLowerCase().includes(query) || 
     cmd.description?.toLowerCase().includes(query) ||
-    cmd.id.toLowerCase().includes(query)
+    cmd.id.toLowerCase().includes(query) ||
+    (cmd.category?.toLowerCase().includes(query) ?? false)
   ).slice(0, 20)
+  
+  return filtered.reduce((groups, command) => {
+    const category = command.category || '未分类'
+    if (!groups[category]) {
+      groups[category] = []
+    }
+    groups[category].push(command)
+    return groups
+  }, {} as Record<string, Command[]>)
 })
 
-const isEmpty = computed(() => filteredCommands.value.length === 0)
+// 获取所有分组的命令数量
+const totalCommands = computed(() => {
+  return Object.values(groupedCommands.value).reduce((total, group) => total + group.length, 0)
+})
+
+const isEmpty = computed(() => totalCommands.value === 0)
 
 const highlightText = (text: string) => {
   if (!searchQuery.value) return text
@@ -87,32 +118,61 @@ const executeCommand = (command?: Command) => {
   closePalette()
 }
 
+// 根据索引获取命令
+const getCommandByIndex = (index: number) => {
+  return flattenedCommands.value[index]
+}
+
+// 转换为扁平数组以便键盘导航
+const flattenedCommands = computed(() => {
+  return Object.values(groupedCommands.value).flat()
+})
+
 const selectNext = () => {
   if (isEmpty.value) return
-  selectedIndex.value = (selectedIndex.value + 1) % filteredCommands.value.length
+  selectedIndex.value = (selectedIndex.value + 1) % flattenedCommands.value.length
   scrollToSelected()
 }
 
 const selectPrevious = () => {
   if (isEmpty.value) return
-  selectedIndex.value = (selectedIndex.value - 1 + filteredCommands.value.length) % filteredCommands.value.length
+  selectedIndex.value = (selectedIndex.value - 1 + flattenedCommands.value.length) % flattenedCommands.value.length
   scrollToSelected()
 }
 
 const scrollToSelected = () => {
   const list = document.querySelector('.cp-list') as HTMLElement
-  const item = list.children[selectedIndex.value] as HTMLElement
-  if (!item) return
+  // 找到当前选中的命令元素
+  const flattened = flattenedCommands.value
+  let currentIndex = 0
+  let found = false
   
-  const listHeight = list.clientHeight
-  const itemHeight = item.clientHeight
-  const itemTop = item.offsetTop
-  const itemBottom = itemTop + itemHeight
-  
-  if (itemTop < list.scrollTop) {
-    list.scrollTop = itemTop
-  } else if (itemBottom > list.scrollTop + listHeight) {
-    list.scrollTop = itemBottom - listHeight
+  for (const [category, commands] of Object.entries(groupedCommands.value)) {
+    // 跳过分组标题
+    currentIndex++
+    
+    for (let i = 0; i < commands.length; i++) {
+      if (currentIndex - 1 === selectedIndex.value) {
+        const item = list.children[currentIndex] as HTMLElement
+        if (item) {
+          const listHeight = list.clientHeight
+          const itemHeight = item.clientHeight
+          const itemTop = item.offsetTop
+          const itemBottom = itemTop + itemHeight
+          
+          if (itemTop < list.scrollTop) {
+            list.scrollTop = itemTop
+          } else if (itemBottom > list.scrollTop + listHeight) {
+            list.scrollTop = itemBottom - listHeight
+          }
+        }
+        found = true
+        break
+      }
+      currentIndex++
+    }
+    
+    if (found) break
   }
 }
 
@@ -134,7 +194,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
       break
     case 'Enter':
       e.preventDefault()
-      executeCommand(filteredCommands.value[selectedIndex.value])
+      executeCommand(getCommandByIndex(selectedIndex.value))
       break
     case 'Escape':
       e.preventDefault()
@@ -197,35 +257,49 @@ onUnmounted(() => {
             autocomplete="off"
             spellcheck="false"
           />
+          <!-- 调试按钮 -->
+          <div style="display: flex; gap: 8px; margin-left: 12px;">
+            <button @click="props.toggleTheme?.('light')" style="padding: 4px 8px; background: #fff; border: 1px solid #ddd; border-radius: 4px;">浅色</button>
+            <button @click="props.toggleTheme?.('dark')" style="padding: 4px 8px; background: #333; color: #fff; border: 1px solid #ddd; border-radius: 4px;">深色</button>
+          </div>
         </div>
         
         <div class="cp-list-wrapper">
           <div class="cp-list">
             <TransitionGroup name="cp-item" tag="div">
-              <div
-                v-for="(command, index) in filteredCommands"
-                :key="command.id"
-                class="cp-item"
-                :class="{
-                  'cp-item-selected': index === selectedIndex,
-                  'cp-item-disabled': command.disabled
-                }"
-                @click="executeCommand(command)"
-                @keydown.enter="executeCommand(command)"
-                role="option"
-                :aria-selected="index === selectedIndex"
-              >
-                <div class="cp-item-content">
-                  <span class="cp-item-label" v-html="highlightText(command.label)"></span>
-                  <span class="cp-item-description" v-if="command.description">{{ command.description }}</span>
+              <!-- 分组显示命令 -->
+              <template v-for="(commands, category) in groupedCommands" :key="category">
+                <!-- 分组标题 -->
+                <div class="cp-group-header">
+                  {{ category }}
                 </div>
                 
-                <div class="cp-item-shortcut" v-if="command.shortcut">
-                  <kbd v-for="(key, i) in command.shortcut" :key="i" class="cp-key">
-                    {{ key === 'CmdOrCtrl' ? (isMac ? '⌘' : 'Ctrl') : key }}
-                  </kbd>
+                <!-- 组内命令 -->
+                <div
+                  v-for="(command, index) in commands"
+                  :key="command.id"
+                  class="cp-item"
+                  :class="{
+                    'cp-item-selected': flattenedCommands.indexOf(command) === selectedIndex,
+                    'cp-item-disabled': command.disabled
+                  }"
+                  @click="executeCommand(command)"
+                  @keydown.enter="executeCommand(command)"
+                  role="option"
+                  :aria-selected="flattenedCommands.indexOf(command) === selectedIndex"
+                >
+                  <div class="cp-item-content">
+                    <span class="cp-item-label" v-html="highlightText(command.label)"></span>
+                    <span class="cp-item-description" v-if="command.description">{{ command.description }}</span>
+                  </div>
+                  
+                  <div class="cp-item-shortcut" v-if="command.shortcut">
+                    <kbd v-for="(key, i) in command.shortcut" :key="i" class="cp-key">
+                      {{ key === 'CmdOrCtrl' ? (isMac ? '⌘' : 'Ctrl') : key }}
+                    </kbd>
+                  </div>
                 </div>
-              </div>
+              </template>
             </TransitionGroup>
             
             <div v-if="isEmpty" class="cp-empty">
@@ -328,11 +402,22 @@ onUnmounted(() => {
   padding: 8px 0;
 }
 
+.cp-group-header {
+  padding: 8px 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cp-text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+}
+
 .cp-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 20px;
+  padding-left: 32px; /* 缩进以区分分组 */
   cursor: pointer;
   transition: background-color 80ms ease;
   border-radius: 8px;
